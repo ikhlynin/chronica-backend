@@ -6,7 +6,7 @@ Chronica Backend — server-side of the news aggregator providing REST API for f
 
 1. **Clone the repository**
 ```bash
-git clone https://github.com/ikhlynin/chronica-backend`
+git clone https://github.com/ikhlynin/chronica-backend
 cd chronica-backend
 ```
 
