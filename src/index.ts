@@ -1,6 +1,8 @@
 import { join } from "node:path";
 import AutoLoad from "@fastify/autoload";
 import Fastify from "fastify";
+import { authRoutes } from "./routes/auth.routes";
+import { feedRoutes } from "./routes/feed.routes";
 
 const PORT = 3000;
 
@@ -18,7 +20,10 @@ const app = Fastify({
 	},
 });
 
-app.register(AutoLoad, { dir: join(__dirname, "shared/plugins") });
+app.register(AutoLoad, { dir: join(__dirname, "plugins") });
+
+app.register(authRoutes, { prefix: "/auth" });
+app.register(feedRoutes);
 
 app.listen({ port: PORT }, (err, adress) => {
 	if (err) {

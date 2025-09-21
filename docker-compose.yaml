@@ -1,13 +1,14 @@
 services:
   mongo:
     image: mongo:latest
+    container_name: mongo
     restart: always
+    ports:
+      - 27017:27017
     env_file:
       - .env
-    ports: 
-      - 27017:27017
-    volumes: 
-      - mongo_data:/data/db
-
+    command: "mongod --replSet rs0 --bind_ip_all"
+    volumes:
+      - "mongo-data:/data/db"
 volumes:
-  mongo_data:
+  mongo-data:
