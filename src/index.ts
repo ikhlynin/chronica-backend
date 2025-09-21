@@ -25,7 +25,7 @@ app.register(AutoLoad, { dir: join(__dirname, "plugins") });
 app.register(authRoutes, { prefix: "/auth" });
 app.register(feedRoutes);
 
-app.listen({ port: PORT }, (err, adress) => {
+app.listen({ port: PORT }, (err, _adress) => {
 	if (err) {
 		app.log.error(err);
 		process.exit(1);
