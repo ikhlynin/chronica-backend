@@ -8,7 +8,7 @@ const healthPlugin = fp(async (fastify: FastifyInstance) => {
 
 	fastify.get("/health/db", async () => {
 		try {
-			await fastify.prisma.user.count();
+			await fastify.prisma.$queryRaw`SELECT 1`;
 			return { status: "ok", service: "database" };
 		} catch (error) {
 			fastify.log.error(error);

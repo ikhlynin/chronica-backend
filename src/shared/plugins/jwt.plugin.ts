@@ -3,7 +3,7 @@ import type { FastifyInstance, FastifyReply, FastifyRequest } from "fastify";
 import fp from "fastify-plugin";
 
 const jwtPlugin = fp(async (fastify: FastifyInstance) => {
-	const jwtSecret = process.env.JWT_SECRET;
+	const jwtSecret = fastify.config.JWT_SECRET;
 	if (!jwtSecret) throw new Error("Jwt secret not found");
 	fastify.register<FastifyJWTOptions>(fastifyJwt, {
 		secret: jwtSecret,
