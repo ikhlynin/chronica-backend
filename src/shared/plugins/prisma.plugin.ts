@@ -12,10 +12,4 @@ const prismaPlugin = fp(async (fastify: FastifyInstance) => {
 	});
 });
 
-declare module "fastify" {
-	interface FastifyInstance {
-		prisma: PrismaClient;
-	}
-}
-
 export default prismaPlugin;

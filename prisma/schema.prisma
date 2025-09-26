@@ -13,3 +13,9 @@ model User {
   name      String
   password  String
 }
+
+model Feed {
+  id    String  @id @default(auto()) @map("_id") @db.ObjectId
+  url   String  @unique
+  items Json
+}
