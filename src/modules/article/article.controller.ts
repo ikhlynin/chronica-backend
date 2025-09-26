@@ -1,4 +1,3 @@
-// src/modules/article/article.controller.ts
 import type { FastifyReply, FastifyRequest } from "fastify";
 import { articleService } from "./article.service";
 
@@ -16,10 +15,9 @@ export const articleController = {
 
 		try {
 			const article = await articleService.parseArticle(guid);
-			return reply.send(article);
+			return reply.sendMessage(article);
 		} catch (err) {
-			request.log.error(err);
-			return reply.status(500).send({ error: "Failed to parse article" });
+			return reply.sendError(err, 500);
 		}
 	},
 };
