@@ -9,8 +9,10 @@ export const feedController = {
 	) => {
 		const { url, force } = request.query;
 		const feedUrl = url || process.env.DEFAULT_FEED_URL;
-		if (!feedUrl)
-			return reply.status(400).send({ error: "Default feed URL not defined" });
+		if (!feedUrl) {
+			const err = "Default feed URL not defined";
+			return reply.sendError(err, 400);
+		}
 
 		try {
 			const forceFetch = force === "1";
@@ -21,7 +23,7 @@ export const feedController = {
 					update: { items },
 					create: { url: feedUrl, items },
 				});
-				return reply.send({ items });
+				return reply.sendMessage(items);
 			}
 
 			const cached = await request.server.prisma.feed.findUnique({
@@ -33,10 +35,9 @@ export const feedController = {
 			await request.server.prisma.feed.create({
 				data: { url: feedUrl, items },
 			});
-			return reply.send({ items });
+			return reply.sendMessage(items);
 		} catch (err) {
-			request.log.error(err);
-			return reply.status(500).send({ error: "Failed to fetch feed" });
+			return reply.sendError(err, 500);
 		}
 	},
 };

@@ -19,18 +19,9 @@ export const authController = (fastify: FastifyInstance) => {
 					{ expiresIn: "1h" },
 				);
 
-				reply
-					.setCookie("token", token, {
-						httpOnly: true,
-						sameSite: "strict",
-						path: "/",
-						maxAge: 3600,
-					})
-					.send({ user: { id: user.id, email: user.email, name: user.name } });
+				return reply.sendWithToken(token, { user });
 			} catch (err: unknown) {
-				if (err instanceof Error)
-					reply.status(401).send({ error: err.message });
-				else reply.status(401).send({ error: "Unknown error" });
+				return reply.sendError(err, 401);
 			}
 		},
 
@@ -44,23 +35,15 @@ export const authController = (fastify: FastifyInstance) => {
 
 				const token = fastify.jwt.sign({ id: user.id, email: user.email });
 
-				reply
-					.setCookie("token", token, {
-						httpOnly: true,
-						sameSite: "strict",
-						path: "/",
-						maxAge: 3600,
-					})
-					.send({ user: { id: user.id, email: user.email, name: user.name } });
+				return reply.sendWithToken(token, { user });
 			} catch (err: unknown) {
-				if (err instanceof Error)
-					reply.status(400).send({ error: err.message });
-				else reply.status(400).send({ error: "Unknown error" });
+				return reply.sendError(err, 401);
 			}
 		},
 
 		logout: async (_request: FastifyRequest, reply: FastifyReply) => {
-			reply.clearCookie("token", { path: "/" }).send({ message: "Logged out" });
+			reply.clearCookie("token", { path: "/" });
+			return reply.sendMessage("Logged out");
 		},
 	};
 };

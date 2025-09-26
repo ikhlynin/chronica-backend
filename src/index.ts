@@ -21,7 +21,9 @@ const app = Fastify({
 	},
 });
 
-app.register(AutoLoad, { dir: join(__dirname, "plugins") });
+app.register(AutoLoad, {
+	dir: join(__dirname, "shared/plugins"),
+});
 
 app.register(authRoutes, { prefix: "/auth" });
 app.register(feedRoutes, { prefix: "/feed" });
