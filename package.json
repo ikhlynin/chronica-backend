@@ -1,6 +1,6 @@
 {
   "scripts": {
-    "start": "node build/main.ts",
+    "start": "node build/index.js",
     "dev": "nodemon -r tsconfig-paths/register -r ts-node/register src/main.ts",
     "build": "tsc",
     "lint": "biome ci",

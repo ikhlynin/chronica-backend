@@ -29,7 +29,7 @@ app.register(authRoutes, { prefix: "/auth" });
 app.register(feedRoutes, { prefix: "/feed" });
 app.register(articleRoutes, { prefix: "/article" });
 
-app.listen({ port: PORT }, (err, _adress) => {
+app.listen({ port: PORT, host: "0.0.0.0" }, (err, _adress) => {
 	if (err) {
 		app.log.error(err);
 		process.exit(1);
