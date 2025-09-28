@@ -3,7 +3,7 @@ import type { FastifyInstance } from "fastify";
 import fp from "fastify-plugin";
 
 const cookiePlugin = fp(async (fastify: FastifyInstance) => {
-	const cookieSecret = process.env.COOKIE_SECRET || "secret";
+	const cookieSecret = fastify.config.COOKIE_SECRET;
 	if (!cookieSecret) throw new Error("Cookie secret not found");
 	fastify.register<FastifyCookieOptions>(cookie, {
 		secret: cookieSecret,
