@@ -8,7 +8,7 @@ export const feedController = {
 		reply: FastifyReply,
 	) => {
 		const { url, force } = request.query;
-		const feedUrl = url || process.env.DEFAULT_FEED_URL;
+		const feedUrl = url || request.server.config.DEFAULT_FEED_URL;
 		if (!feedUrl) {
 			const err = "Default feed URL not defined";
 			return reply.sendError(err, 400);

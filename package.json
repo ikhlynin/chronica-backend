@@ -3,7 +3,6 @@
     "start": "node build/main.ts",
     "dev": "nodemon -r tsconfig-paths/register -r ts-node/register src/main.ts",
     "build": "tsc",
-    "postinstall": "prisma generate && prisma db push",
     "lint": "biome ci",
     "format": "biome format --write .",
     "prisma:generate": "prisma generate",
