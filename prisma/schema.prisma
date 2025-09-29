@@ -19,3 +19,15 @@ model Feed {
   url   String  @unique
   items Json
 }
+
+model LineItem {
+  id             String   @id @default(auto()) @map("_id") @db.ObjectId
+  size           String
+  minCpm         Float
+  maxCpm         Float
+  geo            String
+  adType         String
+  frequencyCap   Int
+  creativeUrl    String
+  createdAt      DateTime @default(now())
+}
