@@ -1,6 +1,8 @@
 import { join } from "node:path";
 import AutoLoad from "@fastify/autoload";
 import Fastify from "fastify";
+import lineItemRoutes from "./modules/adServer/lineItem/line-item.routes";
+import adServerRoutes from "./modules/adServer/server/ad.routes";
 import { articleRoutes } from "./modules/article/article.routes";
 import { authRoutes } from "./modules/auth/auth.routes";
 import { feedRoutes } from "./modules/feed/feed.routes";
@@ -28,6 +30,8 @@ app.register(AutoLoad, {
 app.register(authRoutes, { prefix: "/auth" });
 app.register(feedRoutes, { prefix: "/feed" });
 app.register(articleRoutes, { prefix: "/article" });
+app.register(lineItemRoutes, { prefix: "/ad-server/line-item" });
+app.register(adServerRoutes, { prefix: "/ad-server/ad" });
 
 app.listen({ port: PORT, host: "0.0.0.0" }, (err, _adress) => {
 	if (err) {
