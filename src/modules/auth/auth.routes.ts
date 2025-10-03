@@ -1,10 +1,12 @@
 import type { FastifyInstance } from "fastify";
-import { authController } from "./auth.controller";
 import { loginSchema, logoutSchema, signupSchema } from "./auth.schema";
+import { authService } from "./auth.service";
 
-export const authRoutes = async (fastify: FastifyInstance) => {
-	const controller = authController(fastify);
+const authRoutes = async (fastify: FastifyInstance) => {
+	const controller = authService(fastify);
 	fastify.post("/signup", { schema: signupSchema }, controller.signup);
 	fastify.post("/login", { schema: loginSchema }, controller.login);
 	fastify.post("/logout", { schema: logoutSchema }, controller.logout);
 };
+
+export default authRoutes;

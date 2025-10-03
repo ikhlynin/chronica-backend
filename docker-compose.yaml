@@ -12,5 +12,27 @@ services:
         - ./mongo/init-mongo.js:/docker-entrypoint-initdb.d/init-mongo.js:ro
       command: ["mongod", "--replSet", "rs0", "--bind_ip_all"]
 
+  clickhouse:
+      image: clickhouse/clickhouse-server:latest
+      container_name: clickhouse
+      ports:
+        - "8123:8123"
+        - "9000:9000"
+      env_file:
+        - .env
+      volumes:
+        - clickhouse_data:/var/lib/clickhouse
+
+  tabix:
+    image: spoonest/clickhouse-tabix-web-client:latest
+    container_name: tabix
+    ports:
+      - "8080:8080"
+    env_file:
+      - .env
+    depends_on:
+      - clickhouse
+
 volumes:
   mongo_data:
+  clickhouse_data:
