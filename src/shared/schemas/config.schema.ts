@@ -1,14 +1,22 @@
 export const configSchema = {
 	type: "object",
 	required: ["DEFAULT_FEED_URL", "CORS_ORIGIN"],
+	additionalProperties: true,
 	properties: {
 		DATABASE_URL: { type: "string" },
 		MONGO_INITDB_DATABASE: { type: "string", default: "chronica" },
+		CLICKHOUSE_DB: { type: "string", default: "chronica_clickhouse" },
+		CLICKHOUSE_USER: { type: "string", default: "chronica_user" },
+		CLICKHOUSE_PASSWORD: { type: "string", default: "mypassword" },
+		CLICKHOUSE_HOST: { type: "string", default: "chronica-clickhouse" },
+		CLICKHOUSE_PORT: { type: "number", default: 8123 },
 		JWT_SECRET: { type: "string" },
 		COOKIE_SECRET: { type: "string" },
 		DEFAULT_FEED_URL: { type: "string" },
 		CORS_ORIGIN: { type: "string" },
 		CORS_LOCAL: { type: "string", default: "http://localhost:5173" },
-		PORT: { type: "string", default: "3000" },
+		PORT: { type: "number", default: 3000 },
+		HOST: { type: "string", default: "0.0.0.0" },
+		CRON_SCHEDULE: { type: "string", default: "0 * * * *" },
 	},
 };

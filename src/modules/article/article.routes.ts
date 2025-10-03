@@ -1,11 +1,13 @@
 import type { FastifyInstance } from "fastify";
-import { articleController } from "./article.controller";
 import { articleSchema } from "./article.schema";
+import { articleService } from "./article.service";
 
-export const articleRoutes = async (fastify: FastifyInstance) => {
+const articleRoutes = async (fastify: FastifyInstance) => {
 	fastify.get(
 		"/getArticle",
 		{ schema: articleSchema },
-		articleController.getArticle,
+		articleService.getArticle,
 	);
 };
+
+export default articleRoutes;

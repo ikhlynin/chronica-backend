@@ -34,3 +34,21 @@ export const adSchema = {
 		},
 	},
 };
+
+export const LineItemFilterSchema = {
+	type: "object",
+	properties: {
+		size: { type: "string" },
+		geo: { type: "string" },
+		cpm: { type: "number" },
+		userId: { type: "string" },
+	},
+	additionalProperties: false,
+};
+
+export type LineItemFilterBody = {
+	size?: string;
+	geo?: string;
+	cpm?: number;
+	userId?: string;
+};

@@ -7,7 +7,6 @@ const multipartPlugin = fs(async (fastify: FastifyInstance) => {
 		attachFieldsToBody: true,
 		limits: {
 			fileSize: 10 * 1024 * 1024,
-			files: 1,
 		},
 	});
 });
