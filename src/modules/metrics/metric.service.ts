@@ -1,48 +1,140 @@
-import type { FastifyInstance } from "fastify";
-
-export interface MetricEvent {
-	event_id: number;
-	slice: string;
-	slice_name: string;
-	value: number;
-	created_at?: string;
-}
+import type { FastifyInstance, FastifyRequest } from "fastify";
+import type {
+	ClickHouseCountResponse,
+	ClickHouseResponse,
+	FetchMetricsOptions,
+	MetricEvent,
+} from "./metric.types";
 
 const CACHE_LIMIT = 1000;
 const TIMEOUT = 5000;
 
-const eventCache: MetricEvent[] = [];
-let timeoutHandle: NodeJS.Timeout | null = null;
+export class MetricService {
+	private fastify: FastifyInstance;
+	private eventCache: MetricEvent[] = [];
+	private timeoutHandle: NodeJS.Timeout | null = null;
 
-export function initMetricCache(fastify: FastifyInstance) {
-	async function flushCache() {
-		if (eventCache.length === 0) return;
-		const dataToInsert = eventCache.splice(0, eventCache.length);
-		timeoutHandle = null;
+	constructor(fastify: FastifyInstance) {
+		this.fastify = fastify;
+	}
 
-		const values = dataToInsert
-			.map(
-				(ev) =>
-					`(${ev.event_id}, '${ev.slice}', '${ev.slice_name}', ${ev.value}, now())`,
-			)
-			.join(",");
+	private formatDate(ts: string | Date) {
+		const d = new Date(ts);
+		const yyyy = d.getFullYear();
+		const mm = String(d.getMonth() + 1).padStart(2, "0");
+		const dd = String(d.getDate()).padStart(2, "0");
+		const hh = String(d.getHours()).padStart(2, "0");
+		const min = String(d.getMinutes()).padStart(2, "0");
+		const ss = String(d.getSeconds()).padStart(2, "0");
+		return `${yyyy}-${mm}-${dd} ${hh}:${min}:${ss}`;
+	}
 
-		await fastify.ch.query({
-			query: `INSERT INTO metrics (event_id, slice, slice_name, value, created_at) VALUES ${values}`,
+	async fetchMetrics(options: FetchMetricsOptions = {}) {
+		const {
+			page = 1,
+			limit = 100,
+			events,
+			adapters,
+			creativeIds,
+			date,
+			hour,
+		} = options;
+
+		const offset = (page - 1) * limit;
+
+		const conditions: string[] = [];
+
+		if (events?.length)
+			conditions.push(`event IN (${events.map((e) => `'${e}'`).join(",")})`);
+		if (adapters?.length)
+			conditions.push(
+				`adapter IN (${adapters.map((a) => `'${a}'`).join(",")})`,
+			);
+		if (creativeIds?.length)
+			conditions.push(
+				`creativeId IN (${creativeIds.map((c) => `'${c}'`).join(",")})`,
+			);
+		if (date) conditions.push(`toDate(timestamp) = '${date}'`);
+		if (hour !== undefined) conditions.push(`toHour(timestamp) = ${hour}`);
+
+		const whereClause = conditions.length
+			? `WHERE ${conditions.join(" AND ")}`
+			: "";
+
+		const result = await this.fastify.ch.query({
+			query: `
+			SELECT *
+			FROM metrics
+			${whereClause}
+			ORDER BY timestamp DESC
+			LIMIT ${limit} OFFSET ${offset}
+		`,
+		});
+
+		const raw = await result.json<ClickHouseResponse<MetricEvent>>();
+		const rows = raw.data;
+
+		const countResult = await this.fastify.ch.query({
+			query: `
+			SELECT count(*) AS total
+			FROM metrics
+			${whereClause}
+		`,
+		});
+
+		const countRaw = await countResult.json<ClickHouseCountResponse>();
+		const [{ total }] = countRaw.data;
+
+		return { page, limit, total, data: rows };
+	}
+
+	private async flushCache() {
+		if (this.eventCache.length === 0) return;
+		const dataToInsert = this.eventCache.splice(0, this.eventCache.length);
+		this.timeoutHandle = null;
+
+		await this.fastify.ch.insert({
+			table: "metrics",
+			values: dataToInsert.map((ev) => ({
+				event: ev.event,
+				timestamp: this.formatDate(ev.timestamp),
+				pageUrl: ev.pageUrl,
+				adapter: ev.adapter ?? "",
+				adId: ev.adId ?? "",
+				creativeId: ev.creativeId ?? "",
+				cpm: ev.cpm ?? 0,
+				userId: ev.userId ?? "",
+			})),
+			format: "JSONEachRow",
 		});
 	}
 
-	function addEvents(events: MetricEvent[]) {
-		eventCache.push(...events);
+	addEvents(events: MetricEvent | MetricEvent[], request?: FastifyRequest) {
+		let userId: string | undefined;
 
-		if (!timeoutHandle) {
-			timeoutHandle = setTimeout(flushCache, TIMEOUT);
+		try {
+			const token = request?.cookies?.token;
+			if (token) {
+				const payload = this.fastify.jwt.verify<{ userId: string }>(token);
+				userId = payload.userId;
+			}
+		} catch {}
+
+		const normalizedEvents = (Array.isArray(events) ? events : [events]).map(
+			(ev) => ({ ...ev, userId }),
+		);
+
+		this.eventCache.push(...normalizedEvents);
+
+		if (!this.timeoutHandle) {
+			this.timeoutHandle = setTimeout(
+				() => this.flushCache().catch(console.error),
+				TIMEOUT,
+			);
 		}
 
-		if (eventCache.length >= CACHE_LIMIT) {
-			flushCache();
+		if (this.eventCache.length >= CACHE_LIMIT) {
+			this.flushCache().catch(console.error);
 		}
 	}
-
-	return { addEvents, flushCache };
 }

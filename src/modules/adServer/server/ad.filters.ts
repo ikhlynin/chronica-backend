@@ -19,7 +19,17 @@ export const Filters = {
 	) => {
 		const { size } = request.body;
 		if (!size) return lineItems;
-		return lineItems.filter((li) => li.size === size);
+		let sizeStr = "";
+		if (Array.isArray(size)) {
+			if (Array.isArray(size[0])) {
+				sizeStr = size[0].join("x");
+			} else {
+				sizeStr = size.join("x");
+			}
+		} else {
+			sizeStr = size;
+		}
+		return lineItems.filter((li) => li.size === sizeStr);
 	},
 
 	geo: (
@@ -42,10 +52,10 @@ export const Filters = {
 
 	frequencyCap: (
 		lineItems: LineItem[],
-		request: FastifyRequest<{ Body: LineItemFilterBody }>,
+		_request: FastifyRequest<{ Body: LineItemFilterBody }>,
 		served = new Map<string, Set<number>>(),
+		userId: string,
 	) => {
-		const { userId } = request.body;
 		if (!userId) return lineItems;
 
 		const userServed = served.get(userId) || new Set<number>();
@@ -56,12 +66,13 @@ export const Filters = {
 		lineItems: LineItem[],
 		request: FastifyRequest<{ Body: LineItemFilterBody }>,
 		served = new Map<string, Set<number>>(),
+		userId: string,
 	) => {
 		let items = lineItems;
 		items = Filters.size(items, request);
 		items = Filters.geo(items, request);
 		items = Filters.cpm(items, request);
-		items = Filters.frequencyCap(items, request, served);
+		items = Filters.frequencyCap(items, request, served, userId);
 		return items;
 	},
 };

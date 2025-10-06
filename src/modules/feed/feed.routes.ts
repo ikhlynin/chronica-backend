@@ -15,7 +15,16 @@ const feedRoutes = async (fastify: FastifyInstance) => {
 			try {
 				const { url, force } = request.query;
 				const items = await fetchFeed(request.server, url, force === "1");
-				return reply.send({ items });
+				const normalizedItems = items.map((item) => ({
+					title: item.title ?? "",
+					link: item.link ?? "",
+					guid: item.guid ?? "",
+					content: item.content ?? "",
+					contentSnippet: item.contentSnippet ?? item.content ?? "",
+					isoDate: item.isoDate ?? "",
+					image: item.image ?? "",
+				}));
+				return reply.send({ items: normalizedItems });
 			} catch (err) {
 				console.error("Feed error:", err);
 				return reply.internalServerError(err);

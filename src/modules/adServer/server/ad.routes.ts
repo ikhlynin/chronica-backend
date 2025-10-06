@@ -1,9 +1,9 @@
 import type { FastifyInstance } from "fastify";
-import { adSchema } from "./ad.schema";
+import { getBidsSchema } from "./ad.schema";
 import adService from "./ad.service";
 
 const adServerRoutes = async (fastify: FastifyInstance) => {
-	fastify.post("/", { schema: adSchema }, adService.serve);
+	fastify.post("/getBids", { schema: getBidsSchema }, adService.serve);
 };
 
 export default adServerRoutes;

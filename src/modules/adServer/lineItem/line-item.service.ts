@@ -29,7 +29,6 @@ const lineItemService = {
 	) => {
 		try {
 			const body = request.body;
-
 			const creative = body.creative;
 			if (!creative || creative.type !== "file") {
 				return reply.badRequest("No file uploaded");
@@ -38,7 +37,7 @@ const lineItemService = {
 			const fileBuffer = await creative.toBuffer();
 			const fileName = creative.filename;
 
-			const publicDir = path.join(__dirname, "../../../public");
+			const publicDir = path.join(path.resolve(process.cwd()), "uploads");
 			if (!fs.existsSync(publicDir)) {
 				fs.mkdirSync(publicDir, { recursive: true });
 			}

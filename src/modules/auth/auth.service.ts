@@ -40,8 +40,9 @@ export const authService = (fastify: FastifyInstance) => {
 
 				reply.setCookie("token", token, {
 					httpOnly: true,
-					sameSite: "strict",
+					sameSite: "lax",
 					path: "/",
+					secure: false,
 					maxAge: 3600,
 				});
 
@@ -73,8 +74,9 @@ export const authService = (fastify: FastifyInstance) => {
 
 				reply.setCookie("token", token, {
 					httpOnly: true,
-					sameSite: "strict",
+					sameSite: "lax",
 					path: "/",
+					secure: false,
 					maxAge: 3600,
 				});
 

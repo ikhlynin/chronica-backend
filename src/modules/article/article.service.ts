@@ -12,7 +12,6 @@ export const articleService = {
 	) => {
 		const { guid } = request.query;
 		if (!guid) return reply.badRequest("Missing guid");
-
 		try {
 			const res = await fetch(guid, {
 				headers: {
@@ -37,12 +36,19 @@ export const articleService = {
 					.get()
 					.join("\n\n"),
 				url: guid,
-				creator: $("meta[name='author']").attr("content") || undefined,
-				pubDate:
+				creator:
+					$(".byline-link-text").text().trim() ||
+					$("meta[name='author']").attr("content") ||
+					$("meta[property='article:author']").attr("content") ||
+					$("a[rel='author']").text().trim() ||
+					undefined,
+				isoDate:
 					$("meta[property='article:published_time']").attr("content") ||
+					$("time[datetime]").attr("datetime") ||
+					$("meta[name='date']").attr("content") ||
+					$("time[datetime]").attr("datetime") ||
 					undefined,
 			};
-
 			return reply.send({ ok: true, article });
 		} catch (err) {
 			return reply.internalServerError(err);

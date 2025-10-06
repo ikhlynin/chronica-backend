@@ -28,10 +28,29 @@ services:
     container_name: tabix
     ports:
       - "8080:8080"
-    env_file:
-      - .env
+    environment:
+      - CLICKHOUSE_HOST=clickhouse
+      - CLICKHOUSE_PORT=8123
+      - CLICKHOUSE_USER=default
+      - CLICKHOUSE_PASSWORD=secret
+      - CLICKHOUSE_DB=default
     depends_on:
       - clickhouse
+
+  tempo:
+    image: grafana/tempo:latest
+    command: [ "-config.file=/etc/tempo.yaml" ]
+    volumes:
+      - ./tempo.yaml:/etc/tempo.yaml
+    ports:
+      - "4318:4318"
+      - "3200:3200"
+  grafana:
+    image: grafana/grafana:latest
+    ports:
+      - "3000:3000"
+    environment:
+      - GF_SECURITY_ADMIN_PASSWORD=admin
 
 volumes:
   mongo_data:

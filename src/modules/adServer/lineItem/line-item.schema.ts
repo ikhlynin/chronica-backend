@@ -43,7 +43,7 @@ export const lineItemCreate = {
 			geo: { type: "string" },
 			adType: { type: "string", enum: ["banner", "video"] },
 			frequencyCap: { type: "string" },
-			creative: { type: "string", format: "binary" },
+			creative: { type: "object" },
 		},
 	},
 	response: {
