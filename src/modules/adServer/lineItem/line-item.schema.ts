@@ -21,7 +21,7 @@ export const lineItemSchema = {
 	},
 };
 
-export const lineItemCreate = {
+export const lineItemCreateSchema = {
 	description: "Create a new line item",
 	tags: ["LineItem"],
 	consumes: ["multipart/form-data"],

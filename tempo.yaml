@@ -1,9 +1,29 @@
 server:
+  log_level: info
+  http_listen_address: 0.0.0.0
   http_listen_port: 3200
+  grpc_listen_address: 0.0.0.0
+  grpc_listen_port: 4318
 
 distributor:
   receivers:
     otlp:
       protocols:
+        grpc:
+          endpoint: 0.0.0.0:4317
         http:
-          endpoint: 0.0.0.0:4318
+          endpoint: 0.0.0.0:3199
+
+ingester:
+  trace_idle_period: 10s
+  max_block_duration: 5m
+
+compactor:
+  compaction:
+    block_retention: 1h
+
+storage:
+  trace:
+    backend: local
+    local:
+      path: /tempo-data

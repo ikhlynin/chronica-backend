@@ -7,7 +7,7 @@ import articleRoutes from "./modules/article/article.routes";
 import authRoutes from "./modules/auth/auth.routes";
 import feedRoutes from "./modules/feed/feed.routes";
 import metricRoutes from "./modules/metrics/metric.routes";
-import { startOtel } from "./modules/otel/otel";
+import startOtel from "./modules/otel/otel";
 import configPlugin from "./shared/config/config.plugin";
 
 const app = Fastify({
@@ -26,10 +26,9 @@ const app = Fastify({
 
 async function start() {
 	try {
-		await startOtel();
-
 		await app.register(configPlugin);
 
+		await startOtel();
 		await app.register(AutoLoad, {
 			dir: join(__dirname, "shared/plugins"),
 		});

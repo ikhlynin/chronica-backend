@@ -1,3 +1,6 @@
 node_modules
 .env
 build
+tempo_data
+loki
+punlic

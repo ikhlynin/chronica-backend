@@ -1,5 +1,5 @@
 import type { FastifyInstance } from "fastify";
-import { lineItemGetForm } from "./line-item.schema";
+import { lineItemCreateSchema, lineItemGetForm } from "./line-item.schema";
 import lineItemService from "./line-item.service";
 
 const lineItemRoutes = async (fastify: FastifyInstance) => {
@@ -8,7 +8,11 @@ const lineItemRoutes = async (fastify: FastifyInstance) => {
 		{ schema: lineItemGetForm },
 		lineItemService.getLineItemForm,
 	);
-	fastify.post("/createItem", lineItemService.createLineItem);
+	fastify.post(
+		"/createItem",
+		{ schema: lineItemCreateSchema },
+		lineItemService.createLineItem,
+	);
 };
 
 export default lineItemRoutes;
