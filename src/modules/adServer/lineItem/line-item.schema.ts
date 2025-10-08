@@ -21,7 +21,7 @@ export const lineItemSchema = {
 	},
 };
 
-export const lineItemCreate = {
+export const lineItemCreateSchema = {
 	description: "Create a new line item",
 	tags: ["LineItem"],
 	consumes: ["multipart/form-data"],
@@ -43,7 +43,7 @@ export const lineItemCreate = {
 			geo: { type: "string" },
 			adType: { type: "string", enum: ["banner", "video"] },
 			frequencyCap: { type: "string" },
-			creative: { type: "string", format: "binary" },
+			creative: { type: "object" },
 		},
 	},
 	response: {

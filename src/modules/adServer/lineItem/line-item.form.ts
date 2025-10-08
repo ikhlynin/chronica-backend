@@ -77,10 +77,10 @@ export const lineItemFormHTML = `
 
       form.addEventListener('submit', async (e) => {
         e.preventDefault();
-        const formData = new FormData(form);
-
+        
         try {
-          const res = await fetch('/ad-server/line-item/createItem', {
+            const formData = new FormData(form);
+            const res = await fetch('/lineItem/createItem', {
             method: 'POST',
             body: formData
           });

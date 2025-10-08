@@ -18,8 +18,6 @@ export const FeedSchema = {
 			description: "Feed successfully retrieved",
 			type: "object",
 			properties: {
-				title: { type: "string", description: "Feed title" },
-				link: { type: "string", description: "Feed link" },
 				items: {
 					type: "array",
 					items: {
@@ -27,12 +25,35 @@ export const FeedSchema = {
 						properties: {
 							title: { type: "string", description: "Item title" },
 							link: { type: "string", description: "Item link" },
-							pubDate: { type: "string", description: "Publication date" },
+							guid: {
+								type: "string",
+								description: "Unique identifier for the item",
+							},
 							content: { type: "string", description: "Item content" },
+							contentSnippet: {
+								type: "string",
+								description: "Short snippet of content",
+							},
+							isoDate: {
+								type: "string",
+								description: "Publication date in ISO format",
+							},
+							image: { type: "string", description: "URL to image (optional)" },
 						},
+						required: [
+							"title",
+							"link",
+							"guid",
+							"content",
+							"contentSnippet",
+							"isoDate",
+						],
+						additionalProperties: false,
 					},
 				},
 			},
+			required: ["items"],
+			additionalProperties: false,
 		},
 		400: {
 			description: "Invalid URL or feed could not be retrieved",
@@ -40,6 +61,7 @@ export const FeedSchema = {
 			properties: {
 				error: { type: "string" },
 			},
+			additionalProperties: false,
 		},
 	},
 };

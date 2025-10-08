@@ -1,4 +1,5 @@
 import type { FastifyRequest } from "fastify";
+import type { LineItemFilterBody } from "./ad.schema";
 
 export interface LineItem {
 	id: number;
@@ -12,30 +13,49 @@ export interface LineItem {
 }
 
 export const Filters = {
-	size: (lineItems: LineItem[], request: FastifyRequest) => {
-		const { size } = request.body as { size?: string };
+	size: (
+		lineItems: LineItem[],
+		request: FastifyRequest<{ Body: LineItemFilterBody }>,
+	) => {
+		const { size } = request.body;
 		if (!size) return lineItems;
-		return lineItems.filter((li) => li.size === size);
+		let sizeStr = "";
+		if (Array.isArray(size)) {
+			if (Array.isArray(size[0])) {
+				sizeStr = size[0].join("x");
+			} else {
+				sizeStr = size.join("x");
+			}
+		} else {
+			sizeStr = size;
+		}
+		return lineItems.filter((li) => li.size === sizeStr);
 	},
 
-	geo: (lineItems: LineItem[], request: FastifyRequest) => {
-		const { geo } = request.body as { geo?: string };
+	geo: (
+		lineItems: LineItem[],
+		request: FastifyRequest<{ Body: LineItemFilterBody }>,
+	) => {
+		const { geo } = request.body;
 		if (!geo) return lineItems;
 		return lineItems.filter((li) => li.geo === geo);
 	},
 
-	cpm: (lineItems: LineItem[], request: FastifyRequest) => {
-		const { cpm } = request.body as { cpm?: number };
+	cpm: (
+		lineItems: LineItem[],
+		request: FastifyRequest<{ Body: LineItemFilterBody }>,
+	) => {
+		const { cpm } = request.body;
 		if (cpm === undefined) return lineItems;
 		return lineItems.filter((li) => li.minCpm <= cpm && li.maxCpm >= cpm);
 	},
 
 	frequencyCap: (
 		lineItems: LineItem[],
-		request: FastifyRequest,
+		_request: FastifyRequest<{ Body: LineItemFilterBody }>,
 		served = new Map<string, Set<number>>(),
+		userId: string,
 	) => {
-		const { userId } = request.body as { userId?: string };
 		if (!userId) return lineItems;
 
 		const userServed = served.get(userId) || new Set<number>();
@@ -44,16 +64,15 @@ export const Filters = {
 
 	applyAll: (
 		lineItems: LineItem[],
-		request: FastifyRequest,
+		request: FastifyRequest<{ Body: LineItemFilterBody }>,
 		served = new Map<string, Set<number>>(),
+		userId: string,
 	) => {
-		return Filters.frequencyCap(
-			Filters.cpm(
-				Filters.geo(Filters.size(lineItems, request), request),
-				request,
-			),
-			request,
-			served,
-		);
+		let items = lineItems;
+		items = Filters.size(items, request);
+		items = Filters.geo(items, request);
+		items = Filters.cpm(items, request);
+		items = Filters.frequencyCap(items, request, served, userId);
+		return items;
 	},
 };
