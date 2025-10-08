@@ -11,9 +11,12 @@ const clickhousePlugin = fp(async (fastify: FastifyInstance) => {
 		CLICKHOUSE_PORT,
 	} = fastify.config;
 
-	const url = `http://${CLICKHOUSE_USER}:${CLICKHOUSE_PASSWORD}@${CLICKHOUSE_HOST}:${CLICKHOUSE_PORT}/${CLICKHOUSE_DB}`;
-
-	const chClient = createClient({ url });
+	const chClient = createClient({
+		url: `${CLICKHOUSE_HOST}:${CLICKHOUSE_PORT}`,
+		username: CLICKHOUSE_USER,
+		password: CLICKHOUSE_PASSWORD,
+		database: CLICKHOUSE_DB,
+	});
 
 	fastify.decorate("ch", chClient);
 
