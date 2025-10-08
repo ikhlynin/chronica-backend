@@ -12,9 +12,18 @@ import { SimpleLogRecordProcessor } from "@opentelemetry/sdk-logs";
 import { NodeSDK } from "@opentelemetry/sdk-node";
 
 export default async function startOtel() {
-	const logExporter = new OTLPLogExporter({ url: process.env.OTEL_LOGS_URL });
+	const logExporter = new OTLPLogExporter({
+		url: process.env.OTEL_LOGS_URL,
+		headers: {
+			Authorization: `Bearer ${process.env.LOKI_TOKEN}`,
+		},
+	});
+
 	const traceExporter = new OTLPTraceExporter({
 		url: process.env.OTEL_TRACES_URL,
+		headers: {
+			Authorization: `Bearer ${process.env.TEMPO_TOKEN}`,
+		},
 	});
 
 	const prometheusExporter = new PrometheusExporter({
